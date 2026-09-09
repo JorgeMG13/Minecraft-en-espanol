@@ -1,0 +1,106 @@
+/* ══════════════════════════════════════════════════════════════
+   cards.css · Componentes de tarjeta reutilizables
+   (listados edge y página de inicio)
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Rejillas ── */
+.news-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+.guias-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 16px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 14px; }
+
+/* ── Tarjeta de noticia ── */
+.post-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+.post-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(79,200,0,0.4);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+}
+.post-card-img-wrap { overflow: hidden; flex-shrink: 0; }
+.post-card-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+.post-card-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+.post-card-body { padding: 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.post-card-cat {
+  font-family: var(--pixel);
+  font-size: 6px;
+  color: var(--green);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.post-card-title { font-family: var(--display); font-size: clamp(14px,2.2vw,18px); font-weight: 700; line-height: 1.3; color: var(--txt); }
+.post-card-excerpt { font-size: 14px; color: var(--txt-muted); line-height: 1.6; flex: 1; }
+.post-card-meta { font-family: var(--pixel); font-size: 6px; color: var(--txt-dim); letter-spacing: 1px; margin-top: 4px; }
+
+/* ── Tarjeta de guía ── */
+.guia-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+.guia-card:hover { transform: translateY(-4px); border-color: rgba(79,200,0,0.4); box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+.guia-card-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+.guia-card-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+.guia-card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.guia-cat { font-family: var(--pixel); font-size: 6px; color: var(--green); letter-spacing: 2px; text-transform: uppercase; }
+.guia-title { font-family: var(--display); font-size: 17px; font-weight: 700; color: var(--txt); line-height: 1.3; }
+.guia-steps { font-family: var(--pixel); font-size: 6px; color: var(--txt-muted); margin-top: auto; }
+
+/* Dificultad (insignia en listado y artículo) */
+.dif-badge {
+  font-family: var(--pixel);
+  font-size: 6px;
+  letter-spacing: 1px;
+  padding: 3px 7px;
+  border-radius: 2px;
+  display: inline-block;
+  width: fit-content;
+}
+.dif-facil  { background: rgba(79,200,0,0.15);  color: var(--green); border: 1px solid rgba(79,200,0,0.3); }
+.dif-medio  { background: rgba(245,200,66,0.15); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+.dif-dificil { background: rgba(232,53,53,0.15); color: var(--red); border: 1px solid rgba(232,53,53,0.3); }
+
+/* ── Tarjeta simple (curiosidades / otros) ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--card-accent, var(--gold));
+  border-radius: var(--radius);
+  padding: 20px;
+  text-decoration: none;
+  display: block;
+  transition: transform .2s, box-shadow .2s;
+}
+.card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.4); }
+.card-icon { font-size: 22px; margin-bottom: 10px; display: block; }
+.card-title { font-family: var(--display); font-size: 17px; font-weight: 700; color: var(--txt); margin-bottom: 8px; }
+.card-text { font-size: 16px; line-height: 1.65; color: var(--txt); }
+.card-date { font-family: var(--pixel); font-size: 6px; color: var(--txt-dim); margin-top: 14px; display: block; }

@@ -1,5 +1,11 @@
 {
+  "name": "minecraft-en-espanol",
+  "private": true,
   "dependencies": {
     "@supabase/supabase-js": "^2.0.0"
+  },
+  "scripts": {
+    "backfill:slugs": "node scripts/backfill-slugs.mjs",
+    "verificar": "node scripts/verificar.mjs"
   }
 }

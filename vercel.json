@@ -7,7 +7,8 @@
     { "source": "/curiosidades",        "destination": "/api/list-curiosidades" },
     { "source": "/curiosidades/:id",    "destination": "/api/curiosidad?id=:id" },
     { "source": "/otros",               "destination": "/api/list-otros" },
-    { "source": "/otros/:id",           "destination": "/api/otros?id=:id" }
+    { "source": "/otros/:id",           "destination": "/api/otros?id=:id" },
+    { "source": "/sitemap.xml",         "destination": "/api/sitemap" }
   ],
   "headers": [
     {
@@ -19,16 +20,15 @@
       ]
     },
     {
-      "source": "/sitemap.xml",
+      "source": "/robots.txt",
       "headers": [
-        { "key": "Content-Type",  "value": "application/xml" },
         { "key": "Cache-Control", "value": "public, max-age=86400" }
       ]
     },
     {
-      "source": "/robots.txt",
+      "source": "/assets/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=86400" }
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]
     }
   ],

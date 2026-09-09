@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Panel · Minecraft en Español</title>
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@400;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/assets/css/admin.css" />
+</head>
+<body>
+
+  <!-- LOGIN (se muestra si no hay sesión) -->
+  <div class="login-pantalla" id="login-pantalla" style="display:none;">
+    <form class="login-caja" id="form-login">
+      <h1>⛏️ PANEL DE ADMINISTRACIÓN</h1>
+      <p>Minecraft en Español · Acceso restringido</p>
+      <div class="campo">
+        <label for="login-password">CONTRASEÑA</label>
+        <input type="password" id="login-password" autocomplete="current-password" required />
+      </div>
+      <button class="btn btn-primario" style="width:100%;justify-content:center;" type="submit">Entrar</button>
+    </form>
+  </div>
+
+  <!-- PANEL -->
+  <div class="layout" id="layout-panel" style="display:none;">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="contenido">
+      <div class="cabecera-pagina">
+        <div>
+          <h1>Panel</h1>
+          <div class="sub">Resumen del estado del sitio</div>
+        </div>
+        <a class="btn btn-primario" href="/admin/noticia.html">＋ Nueva noticia</a>
+      </div>
+
+      <div class="rejilla-stats" id="stats-grid"></div>
+
+      <div class="panel">
+        <h2>📰 Últimas noticias <span class="insignia" id="total-noticias"></span></h2>
+        <div id="ultimas-noticias"></div>
+        <div class="centrado"><a class="btn btn-borde btn-mini" href="/admin/noticias.html">Ver todas →</a></div>
+      </div>
+
+      <div class="panel">
+        <h2>✉️ Últimos mensajes <span class="insignia" id="total-mensajes"></span></h2>
+        <div id="ultimos-mensajes"></div>
+        <div class="centrado"><a class="btn btn-borde btn-mini" href="/admin/mensajes.html">Ver todos →</a></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/assets/js/utils/dom.js"></script>
+  <script src="/admin/config.js"></script>
+  <script src="/admin/assets/js/services/api.js"></script>
+  <script src="/admin/assets/js/components/ui.js"></script>
+  <script src="/admin/assets/js/components/nav.js"></script>
+  <script src="/admin/assets/js/pages/panel.js"></script>
+</body>
+</html>

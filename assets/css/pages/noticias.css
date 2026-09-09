@@ -1,0 +1,8 @@
+/* noticias.css · Página /noticias (listado server-side) */
+
+/* La primera tarjeta ocupa las dos columnas */
+.news-grid .post-card:first-child { grid-column: span 2; }
+@media (max-width: 600px) {
+  .news-grid { grid-template-columns: 1fr; }
+  .news-grid .post-card:first-child { grid-column: span 1; }
+}

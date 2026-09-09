@@ -1,10 +1,8 @@
-// api/buscar-noticias.js
-const { createClient } = require('@supabase/supabase-js');
-
-const sb = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
+// api/buscar-noticias.js — cron diario: recopila titulares de Minecraft desde
+// RSS, Groq redacta las noticias en español y se guardan en `noticias_ia`
+// con estado='pendiente' para su revisión en el panel.
+import { clienteSupabase, cronAutorizado, aplicarCors, fechaHoyEs } from './_lib/node.js';
+import { esAdmin, respuesta401 } from './_lib/admin-auth.js';
 
 const FUENTES = [
   { url: 'https://www.minecraft.net/en-us/feeds/community-content/articles.xml', nombre: 'Minecraft.net' },
@@ -48,20 +46,14 @@ function extraerArticulos(xml) {
   return articulos;
 }
 
-module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', 'https://minecraft-en-espanol-admin.vercel.app');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Authorization');
+export default async function handler(req, res) {
+  aplicarCors(res, 'GET');
   res.setHeader('Cache-Control', 'no-store');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const auth = req.headers['authorization'];
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return res.status(401).json({ error: 'No autorizado' });
-  }
+  if (!cronAutorizado(req) && !esAdmin(req)) return respuesta401(res);
 
-  const fechaHoy = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+  const fechaHoy = fechaHoyEs();
   const articulos = [];
 
   for (const fuente of FUENTES) {
@@ -143,17 +135,17 @@ Genera entre 3 y 6 noticias. Incluye el índice exacto del titular original. No 
     const original = articulos[n.indice] || {};
     return {
       titulo: n.titulo,
-      texto:  n.texto,
+      texto: n.texto,
       enlace: original.enlace || null,
       imagen: original.imagen || null,
       fuente: n.fuente || original.fuente || 'IA',
-      fecha:  fechaHoy,
+      fecha: fechaHoy,
       estado: 'pendiente'
     };
   });
 
-  const { error } = await sb.from('noticias_ia').insert(rows);
+  const { error } = await clienteSupabase().from('noticias_ia').insert(rows);
   if (error) return res.status(500).json({ error: error.message });
 
   return res.status(200).json({ ok: true, guardadas: rows.length });
-};
+}

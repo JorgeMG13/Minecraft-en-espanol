@@ -1,0 +1,39 @@
+/* curiosidades.css · Página /curiosidades (variante dorada) */
+
+body::before {
+  background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,200,66,0.05) 0%, transparent 60%);
+}
+.pixel-strip {
+  background: repeating-linear-gradient(90deg,#f5c842 0,#f5c842 8px,#d4a800 8px,#d4a800 16px,#b38f00 16px,#b38f00 24px,#d4a800 24px,#d4a800 32px);
+}
+:root { --border-em: rgba(245,200,66,0.35); }
+.btn-back:hover { color: var(--gold); }
+.header-label { color: var(--gold); }
+.page-title span { color: var(--gold); }
+.card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.4), 0 0 0 1px rgba(245,200,66,0.2); }
+
+/* ── Detalle de curiosidad (/curiosidades/:id) ── */
+.curiosidad-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 40px;
+}
+.curiosidad-icon-big { font-size: 52px; margin-bottom: 24px; display: block; }
+.curiosidad-block .art-meta { color: var(--gold); margin-bottom: 20px; }
+.curiosidad-block .art-body {
+  font-family: var(--display);
+  font-size: clamp(20px,3.5vw,26px);
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--txt);
+}
+.curiosidad-block .art-date {
+  margin-top: 32px;
+  margin-bottom: 0;
+  padding-top: 24px;
+  padding-bottom: 0;
+  border-bottom: none;
+  border-top: 1px solid var(--border);
+}

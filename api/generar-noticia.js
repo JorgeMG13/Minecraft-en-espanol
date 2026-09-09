@@ -1,15 +1,13 @@
-// api/generar-noticia.js
-module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', 'https://minecraft-en-espanol-admin.vercel.app');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+// api/generar-noticia.js — descarga una URL, extrae el contenido y Groq
+// redacta una propuesta de noticia en español (sin publicar nada).
+import { cronAutorizado, aplicarCors } from './_lib/node.js';
+import { esAdmin, respuesta401 } from './_lib/admin-auth.js';
 
+export default async function handler(req, res) {
+  aplicarCors(res, 'POST');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const auth = req.headers['authorization'];
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return res.status(401).json({ error: 'No autorizado' });
-  }
+  if (!cronAutorizado(req) && !esAdmin(req)) return respuesta401(res);
 
   const { url } = req.body;
   if (!url) return res.status(400).json({ error: 'Falta la URL' });
@@ -52,7 +50,7 @@ module.exports = async function handler(req, res) {
         messages: [
           {
             role: 'system',
-            content: `Eres un redactor de noticias de Minecraft en español. 
+            content: `Eres un redactor de noticias de Minecraft en español.
 Tu tarea es transformar el contenido extraído de una web en una noticia limpia y atractiva en español.
 Responde SOLO con un JSON con este formato exacto, sin texto adicional:
 {"titulo": "Título corto y atractivo en español", "texto": "2-3 frases en español resumiendo la noticia de forma clara y directa, sin mencionar autores, fechas ni créditos"}`
@@ -67,20 +65,19 @@ Responde SOLO con un JSON con este formato exacto, sin texto adicional:
 
     const groqData = await groqRes.json();
     const respuesta = groqData.choices?.[0]?.message?.content || '';
-console.log('Groq respuesta:', respuesta);
-console.log('Groq data:', JSON.stringify(groqData));
+    console.log('Groq respuesta:', respuesta);
 
     let titulo = '';
-    let texto  = '';
+    let texto = '';
 
     try {
       const parsed = JSON.parse(respuesta.replace(/```json|```/g, '').trim());
       titulo = parsed.titulo || '';
-      texto  = parsed.texto  || '';
+      texto = parsed.texto || '';
     } catch (e) {
       // Si no parsea, usar el texto tal cual
       titulo = respuesta.split('\n')[0].slice(0, 100);
-      texto  = respuesta.slice(0, 400);
+      texto = respuesta.slice(0, 400);
     }
 
     return res.status(200).json({ ok: true, titulo, texto, imagen, enlace: url });
@@ -89,4 +86,4 @@ console.log('Groq data:', JSON.stringify(groqData));
     console.error('generar-noticia error:', err.message);
     return res.status(500).json({ error: err.message });
   }
-};
+}

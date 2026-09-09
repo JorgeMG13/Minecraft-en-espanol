@@ -1,0 +1,6 @@
+/* articulo.css · Páginas de detalle (noticia / guía / curiosidad / otro) */
+
+#wrap { max-width: 780px; }
+
+/* La insignia de dificultad del detalle es algo mayor que en listado */
+.dif-badge { padding: 4px 9px; margin-bottom: 14px; }

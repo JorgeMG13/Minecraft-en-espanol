@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Editor · Panel Minecraft en Español</title>
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@400;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/assets/css/admin.css" />
+  <!-- Estilos públicos para la vista previa del artículo -->
+  <link rel="stylesheet" href="/assets/css/global/global.css" />
+  <link rel="stylesheet" href="/assets/css/pages/articulo.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="contenido">
+      <div class="cabecera-pagina">
+        <div>
+          <h1 id="titulo-editor">Nueva noticia</h1>
+          <div class="sub" id="sub-editor">Completa los campos y guarda</div>
+        </div>
+        <a class="btn btn-borde" href="/admin/noticias.html">← Volver</a>
+      </div>
+
+      <form id="form-noticia" autocomplete="off">
+        <div class="panel">
+          <h2>📝 Contenido</h2>
+          <div class="campo">
+            <label for="campo-titulo">TÍTULO *</label>
+            <input type="text" id="campo-titulo" maxlength="200" placeholder="Título de la noticia" required />
+          </div>
+          <div class="campo">
+            <label for="campo-texto">CONTENIDO *</label>
+            <textarea id="campo-texto" placeholder="Texto de la noticia…" required></textarea>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>🔗 Multimedia y enlaces</h2>
+          <div class="campo">
+            <label for="campo-imagen">IMAGEN (URL)</label>
+            <input type="url" id="campo-imagen" placeholder="https://…" />
+            <img class="vista-mini" id="preview-imagen" alt="Vista previa de la imagen" />
+          </div>
+          <div class="campo">
+            <label for="campo-video">VÍDEO DE YOUTUBE (URL)</label>
+            <input type="url" id="campo-video" placeholder="https://www.youtube.com/watch?v=… o https://youtu.be/…" />
+            <div class="ayuda">Se acepta cualquier formato de YouTube (watch, youtu.be, shorts, con parámetros). Se convierte automáticamente a reproductor.</div>
+            <div id="preview-video" style="margin-top:10px;"></div>
+          </div>
+          <div class="campo">
+            <label for="campo-enlace">ENLACE EXTERNO (fuente / más información)</label>
+            <input type="url" id="campo-enlace" placeholder="https://…" />
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>⚙️ Publicación</h2>
+          <div class="campo-fila">
+            <div class="campo">
+              <label for="campo-slug">SLUG (URL)</label>
+              <div style="display:flex;gap:8px;">
+                <input type="text" id="campo-slug" placeholder="se genera automáticamente" />
+                <button type="button" class="btn btn-borde btn-mini" id="btn-slug-auto" title="Generar desde el título">↻ Auto</button>
+              </div>
+              <div class="ayuda" id="ayuda-slug">Déjalo vacío para generarlo desde el título. Cámbialo solo si necesitas una URL concreta; el servidor comprueba que no esté repetido.</div>
+            </div>
+            <div class="campo" id="campo-estado-wrap">
+              <label for="campo-estado">ESTADO</label>
+              <select id="campo-estado">
+                <option value="borrador">Borrador (no visible)</option>
+                <option value="publicada">Publicada</option>
+              </select>
+            </div>
+          </div>
+          <div class="campo-fila">
+            <div class="campo">
+              <label for="campo-fecha">FECHA (visible)</label>
+              <input type="date" id="campo-fecha" />
+            </div>
+            <div class="campo">
+              <label for="campo-fuente">FUENTE</label>
+              <input type="text" id="campo-fuente" placeholder="Ej.: Minecraft.net, IA, Manual…" />
+            </div>
+          </div>
+          <div class="campo" id="campo-programar-wrap" style="display:none;">
+            <label for="campo-programar">PUBLICAR EL…</label>
+            <input type="datetime-local" id="campo-programar" />
+            <div class="ayuda">La noticia se moverá a la cola de programadas y se publicará sola cuando llegue la hora.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button type="submit" class="btn btn-primario" id="btn-guardar">💾 Guardar</button>
+          <button type="button" class="btn btn-oro" id="btn-publicar" style="display:none;">🚀 Publicar ahora</button>
+          <button type="button" class="btn btn-morado" id="btn-programar">📅 Programar…</button>
+          <button type="button" class="btn btn-borde" id="btn-preview">👁 Vista previa</button>
+          <button type="button" class="btn btn-peligro" id="btn-descartar" style="display:none;">🗑 Descartar propuesta</button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script src="/assets/js/utils/dom.js"></script>
+  <script src="/assets/js/utils/video.js"></script>
+  <script src="/admin/config.js"></script>
+  <script src="/admin/assets/js/services/api.js"></script>
+  <script src="/admin/assets/js/components/ui.js"></script>
+  <script src="/admin/assets/js/components/nav.js"></script>
+  <script src="/admin/assets/js/utils/formato.js"></script>
+  <script src="/admin/assets/js/pages/noticia.js"></script>
+</body>
+</html>
