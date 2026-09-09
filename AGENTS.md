@@ -1,3 +1,6 @@
+# Instrucciones del Asistente
+Por favor, responde siempre en idioma español. Todo el código que generes, así como las explicaciones y comentarios, deben estar estrictamente en español.
+
 ## API Structure (Actual — actualizado)
 
 ### Edición: Edge Functions (8)
