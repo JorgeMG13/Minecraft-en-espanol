@@ -1,5 +1,7 @@
 export const config = { runtime: 'edge' };
 
+import { checkRateLimit, getClientIP, corsHeaders, rateLimitHeaders } from './_lib/rate-limit.js';
+
 const SUPABASE_URL      = 'https://mtkesqoywahieuapftmh.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10a2VzcW95d2FoaWV1YXBmdG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2ODM1OTksImV4cCI6MjA4NzI1OTU5OX0.b_LmSnX_CGjL2YU5-JHqh14qHfv8NM9WNeMv5scZBpY';
 const SITE              = 'https://minecraft-en-espanol.vercel.app';
@@ -49,10 +51,29 @@ const CSS = `
 `;
 
 export default async function handler(req) {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: corsHeaders() });
+  }
+
+  const ip = getClientIP(req);
+  const { allowed, remaining, resetMs } = checkRateLimit(ip);
+  
+  if (!allowed) {
+    return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+      status: 429,
+      headers: { 
+        ...corsHeaders(), 
+        'Content-Type': 'application/json',
+        ...rateLimitHeaders(0, resetMs),
+        'Retry-After': String(Math.ceil(resetMs / 1000))
+      }
+    });
+  }
+  
   let items = [];
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/guias?select=id,titulo,imagen_url,categoria,dificultad,pasos&order=created_at.desc`,
+      `${SUPABASE_URL}/rest/v1/guias?select=id,titulo,imagen_url,categoria,dificultad,pasos,slug&order=created_at.desc`,
       { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
     );
     items = await res.json();
@@ -66,7 +87,8 @@ export default async function handler(req) {
         const imgHtml = g.imagen_url
           ? `<img class="guia-card-img" src="${esc(g.imagen_url)}" alt="${esc(g.titulo)} — Guía Minecraft en Español" loading="lazy" />`
           : `<div class="guia-card-placeholder">📖</div>`;
-        return `<a class="guia-card" href="${SITE}/guias/${g.id}">
+        const guiaUrl = g.slug ? `${SITE}/guias/${g.slug}` : `${SITE}/guias/${g.id}`;
+        return `<a class="guia-card" href="${guiaUrl}">
           ${imgHtml}
           <div class="guia-card-body">
             ${g.dificultad ? `<span class="dif-badge ${difClass(g.dificultad)}">${esc(g.dificultad)}</span>` : ''}
@@ -86,7 +108,7 @@ export default async function handler(req) {
     "itemListElement": items.slice(0, 10).map((g, i) => ({
       "@type": "ListItem",
       "position": i + 1,
-      "url": `${SITE}/guias/${g.id}`,
+      "url": g.slug ? `${SITE}/guias/${g.slug}` : `${SITE}/guias/${g.id}`,
       "name": g.titulo
     }))
   };
@@ -142,6 +164,7 @@ export default async function handler(req) {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 's-maxage=120, stale-while-revalidate=600',
+      ...rateLimitHeaders(remaining, resetMs),
     },
   });
 }

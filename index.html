@@ -832,11 +832,30 @@
   <div class="pixel-strip-bottom"></div>
   <footer>© 2026 MINECRAFT EN ESPAÑOL · HECHO CON BLOQUES PARA VOSOTROS</footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = 'https://mtkesqoywahieuapftmh.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10a2VzcW95d2FoaWV1YXBmdG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2ODM1OTksImV4cCI6MjA4NzI1OTU5OX0.b_LmSnX_CGjL2YU5-JHqh14qHfv8NM9WNeMv5scZBpY';
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+    const PROXY = '/api/supabase-proxy';
+
+    async function proxyFetch(table, action, params = {}) {
+      const url = new URL(PROXY, window.location.origin);
+      url.searchParams.set('table', table);
+      url.searchParams.set('action', action);
+      Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Proxy error: ${res.status}`);
+      return res.json();
+    }
+    async function proxyPost(table, action, body) {
+      const url = new URL(PROXY, window.location.origin);
+      url.searchParams.set('table', table);
+      url.searchParams.set('action', action);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error(`Proxy error: ${res.status}`);
+      return res.json();
+    }
 
     const _cache = { noticia:[], curiosidad:[], quiz:[], otros:[], guias:[] };
     let _guiasFiltro = 'all';
@@ -845,10 +864,10 @@
     /* ══ SEARCH ══ */
     function buildSearchIndex() {
       _searchIndex = [];
-      _cache.noticia.forEach(n    => _searchIndex.push({ tipo:'NOTICIA',    titulo:n.titulo,                 excerpt:n.texto?.slice(0,80),  action:()=>{ window.location.href='/noticias/'+n.id; } }));
-      _cache.guias.forEach(g      => _searchIndex.push({ tipo:'GUÍA',       titulo:g.titulo,                 excerpt:g.categoria,           action:()=>{ window.location.href='/guias/'+g.id; } }));
-      _cache.curiosidad.forEach(c => _searchIndex.push({ tipo:'CURIOSIDAD', titulo:c.texto?.slice(0,50)+'…', excerpt:c.texto,               action:()=>{ window.location.href='/curiosidades/'+c.id; } }));
-      _cache.otros.forEach(o      => _searchIndex.push({ tipo:'OTROS',      titulo:o.titulo,                 excerpt:o.texto,               action:()=>{ window.location.href='/otros/'+o.id; } }));
+      _cache.noticia.forEach(n    => _searchIndex.push({ tipo:'NOTICIA',    titulo:n.titulo,                 excerpt:n.texto?.slice(0,80),  action:()=>{ window.location.href='/noticias/'+n.slug; } }));
+      _cache.guias.forEach(g      => _searchIndex.push({ tipo:'GUÍA',       titulo:g.titulo,                 excerpt:g.categoria,           action:()=>{ window.location.href='/guias/'+g.slug; } }));
+      _cache.curiosidad.forEach(c => _searchIndex.push({ tipo:'CURIOSIDAD', titulo:c.texto?.slice(0,50)+'…', excerpt:c.texto,               action:()=>{ window.location.href='/curiosidades/'+c.slug; } }));
+      _cache.otros.forEach(o      => _searchIndex.push({ tipo:'OTROS',      titulo:o.titulo,                 excerpt:o.texto,               action:()=>{ window.location.href='/otros/'+o.slug; } }));
       _cache.quiz.forEach(q => { const opciones=Array.isArray(q.opciones)?q.opciones:JSON.parse(q.opciones||'[]'); _searchIndex.push({ tipo:'QUIZ', titulo:q.pregunta, excerpt:opciones.join(' · '), action:()=>showSection('quiz',document.getElementById('nav-quiz')) }); });
     }
     document.getElementById('global-search').addEventListener('input', function() {
@@ -880,16 +899,19 @@
     }
     function renderTodo() { renderNoticias(); renderGuias(); renderCuriosidades(); renderQuiz(); renderOtros(); }
 
-    /* ══ SUPABASE ══ */
     async function registrarVisita() {
       const clave = localStorage.getItem('visita_uid') || (()=>{ const u=crypto.randomUUID(); localStorage.setItem('visita_uid',u); return u; })();
-      await sb.rpc('registrar_visita',{p_clave:clave});
+      await proxyPost('noticias', 'search', { query: '', table: 'noticias', select: 'id', limit: 1 });
     }
     async function _fetchBin(tipo) {
       const tabla = tipo==='noticia'?'noticias':tipo==='curiosidad'?'curiosidades':tipo==='quiz'?'quiz':tipo==='guias'?'guias':'otros';
-      try { const {data}=await sb.from(tabla).select('*').order('created_at',{ascending:false}); _cache[tipo]=data||[]; }
-      catch(e){ _cache[tipo]=[]; }
+      try { 
+        const data = await proxyFetch(tabla, 'list', { select: '*', order: 'created_at.desc', limit: '100' });
+        _cache[tipo] = data || []; 
+      } catch(e){ _cache[tipo]=[]; }
     }
+    function getDatos(t){ return _cache[t]||[]; }
+    function esc(s){ return String(s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"'); }
     function getDatos(t){ return _cache[t]||[]; }
     function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -929,7 +951,7 @@
       const imgHtml = n.imagen
         ? `<div class="post-card-img-wrap"><img class="post-card-img" src="${esc(n.imagen)}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<div class=post-card-img-placeholder><img src=logo.png alt=Logo /></div>'" /></div>`
         : `<div class="post-card-img-placeholder"><img src="logo.png" alt="Logo" /></div>`;
-      return `<a class="post-card" href="/noticias/${n.id}" style="text-decoration:none;">
+      return `<a class="post-card" href="/noticias/${n.slug || n.id}" style="text-decoration:none;">
         ${imgHtml}
         <div class="post-card-body">
           <span class="post-card-category">Noticia</span>
@@ -960,7 +982,7 @@
       const imgHtml = g.imagen_url
         ? `<img class="guia-card-img" src="${esc(g.imagen_url)}" alt="" loading="lazy" onerror="this.style.display='none'" />`
         : `<div class="guia-card-img-placeholder">📖</div>`;
-      return `<a class="guia-card" href="/guias/${g.id}" style="text-decoration:none;">
+      return `<a class="guia-card" href="/guias/${g.slug || g.id}" style="text-decoration:none;">
         ${imgHtml}
         <div class="guia-card-body">
           ${g.dificultad?`<span class="guia-dificultad ${difClass(g.dificultad)}">${esc(g.dificultad)}</span>`:''}
@@ -1022,7 +1044,7 @@
       const lista=getDatos('otros');
       document.getElementById('otros-list').innerHTML=lista.length===0
         ?'<div class="empty-state">🎭 Aún no hay contenido.</div>'
-        :lista.map(c=>`<a class="otros-card" href="/otros/${c.id}" style="text-decoration:none;"><h3>${esc(c.titulo||'')}</h3><p>${esc(c.texto.slice(0,100))}${c.texto.length>100?'…':''}</p><span class="post-date">${c.fecha}</span></a>`).join('');
+        :lista.map(c=>`<a class="otros-card" href="/otros/${c.slug || c.id}" style="text-decoration:none;"><h3>${esc(c.titulo||'')}</h3><p>${esc(c.texto.slice(0,100))}${c.texto.length>100?'…':''}</p><span class="post-date">${c.fecha}</span></a>`).join('');
     }
     function abrirOtros(id) {
       const c=getDatos('otros').find(x=>x.id===id); if(!c) return;

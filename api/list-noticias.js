@@ -1,5 +1,7 @@
 export const config = { runtime: 'edge' };
 
+import { checkRateLimit, getClientIP, corsHeaders, rateLimitHeaders } from './_lib/rate-limit.js';
+
 const SUPABASE_URL    = 'https://mtkesqoywahieuapftmh.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10a2VzcW95d2FoaWV1YXBmdG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2ODM1OTksImV4cCI6MjA4NzI1OTU5OX0.b_LmSnX_CGjL2YU5-JHqh14qHfv8NM9WNeMv5scZBpY';
 const SITE            = 'https://minecraft-en-espanol.vercel.app';
@@ -42,10 +44,29 @@ const CSS = `
 `;
 
 export default async function handler(req) {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: corsHeaders() });
+  }
+
+  const ip = getClientIP(req);
+  const { allowed, remaining, resetMs } = checkRateLimit(ip);
+  
+  if (!allowed) {
+    return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+      status: 429,
+      headers: { 
+        ...corsHeaders(), 
+        'Content-Type': 'application/json',
+        ...rateLimitHeaders(0, resetMs),
+        'Retry-After': String(Math.ceil(resetMs / 1000))
+      }
+    });
+  }
+  
   let items = [];
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/noticias?select=id,titulo,texto,imagen,fecha&order=created_at.desc`,
+      `${SUPABASE_URL}/rest/v1/noticias?select=id,titulo,texto,imagen,fecha,slug&order=created_at.desc`,
       { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
     );
     items = await res.json();
@@ -59,7 +80,8 @@ export default async function handler(req) {
           ? `<div class="post-card-img-wrap"><img class="post-card-img" src="${esc(n.imagen)}" alt="${esc(n.titulo)}" loading="lazy" /></div>`
           : `<div class="post-card-placeholder">📰</div>`;
         const excerpt = (n.texto || '').slice(0, 120) + ((n.texto || '').length > 120 ? '…' : '');
-        return `<a class="post-card" href="${SITE}/noticias/${n.id}">
+        const noticiaUrl = n.slug ? `${SITE}/noticias/${n.slug}` : `${SITE}/noticias/${n.id}`;
+        return `<a class="post-card" href="${noticiaUrl}">
           ${imgHtml}
           <div class="post-card-body">
             <span class="post-card-cat">Noticia</span>
@@ -80,7 +102,7 @@ export default async function handler(req) {
     "itemListElement": items.slice(0, 10).map((n, i) => ({
       "@type": "ListItem",
       "position": i + 1,
-      "url": `${SITE}/noticias/${n.id}`,
+      "url": n.slug ? `${SITE}/noticias/${n.slug}` : `${SITE}/noticias/${n.id}`,
       "name": n.titulo
     }))
   };
@@ -136,6 +158,7 @@ export default async function handler(req) {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 's-maxage=120, stale-while-revalidate=600',
+      ...rateLimitHeaders(remaining, resetMs),
     },
   });
 }
