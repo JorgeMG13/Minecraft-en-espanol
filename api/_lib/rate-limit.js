@@ -42,7 +42,7 @@ export function getClientIP(req) {
 
 export function corsHeaders() {
   return {
-    'Access-Control-Allow-Origin': 'https://beta-minecraft-en-espanol.vercel.app',
+    'Access-Control-Allow-Origin': 'https://minecraft-en-espanol.vercel.app',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Max-Age': '86400',
