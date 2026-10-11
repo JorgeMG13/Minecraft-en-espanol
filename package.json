@@ -1,5 +1,18 @@
 {
+  "name": "minecraft-en-espanol-mcp",
+  "version": "1.0.0",
+  "description": "MCP Server for Minecraft en Español",
+  "type": "module",
+  "main": "mcp-server.js",
+  "scripts": {
+    "start": "node mcp-server.js",
+    "dev": "node --watch mcp-server.js"
+  },
   "dependencies": {
-    "@supabase/supabase-js": "^2.0.0"
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

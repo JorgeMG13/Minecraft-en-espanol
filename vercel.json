@@ -8,7 +8,11 @@
     { "source": "/curiosidades/:id",    "destination": "/api/curiosidad?id=:id" },
     { "source": "/otros",               "destination": "/api/list-otros" },
     { "source": "/otros/:slug",         "destination": "/api/otros?slug=:slug" },
-    { "source": "/api/supabase-proxy", "destination": "/api/supabase-proxy" }
+    { "source": "/api/supabase-proxy", "destination": "/api/supabase-proxy" },
+    { "source": "/api/mcp",             "destination": "/api/mcp" }
+  ],
+  "routes": [
+    { "source": "/api/mcp", "route": "api/mcp.js" }
   ],
   "redirects": [
     { "source": "/index.html",      "destination": "/",             "permanent": true },
