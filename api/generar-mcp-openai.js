@@ -1,7 +1,5 @@
 export const config = { runtime: 'edge' };
 
-import { checkRateLimit, getClientIP, corsHeaders, rateLimitHeaders } from './_lib/rate-limit.js';
-
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const SUPABASE_URL = 'https://mtkesqoywahieuapftmh.supabase.co';
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
