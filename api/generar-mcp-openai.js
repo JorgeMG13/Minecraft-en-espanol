@@ -53,10 +53,6 @@ const PROMPTS = {
 }`
 };
 
-function validateSlug(slug) {
-  return slug && /^[a-z0-9-]+$/.test(slug) && slug.length <= 80;
-}
-
 function validateUUID(id) {
   return id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
 }
@@ -201,6 +197,3 @@ function toSlug(str) {
     .slice(0, 80);
 }
 
-function validateSlug(slug) {
-  return slug && /^[a-z0-9-]+$/.test(slug) && slug.length <= 80;
-}
